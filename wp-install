@@ -91,7 +91,7 @@ read -e wpuser
 # accept admin password
 question "Admin Password: "
 read -e pass
-if [[ -z "$var" ]]
+if [[ -z "$pass" ]]
 	then
   echo "Generating a random password..."
 	# generate random 12 character password
