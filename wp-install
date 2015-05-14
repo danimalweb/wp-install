@@ -43,30 +43,29 @@ hr
 # accept the name of our website
 echo "Enter site name:"
 read -e sitename
-echo ""
+echo
 
 # accept site url
 echo "Enter the url of your install"
 echo "Example: dev.myside.local"
 read -e urlpath
-echo ""
+echo
 
 hr
 
 # accept admin username
 echo "Admin username:"
 read -e wpuser
-echo ""
+echo
 
 # accept admin password
 echo "Admin Password:"
 read -e pass
-echo ""
+echo
 
 # accept admin email
 echo "Admin email address:"
 read -e admin_email
-echo ""
 
 hr
 
@@ -79,36 +78,38 @@ hr
 # accept user input for the databse name
 echo "Database Name:"
 read -e dbname
-echo ""
+echo
 
 # accept user input for the databse user
 echo "Database Username:"
 read -e dbuser
-echo ""
+echo
 
 # accept user input for the databse password
 echo "Database Password:"
 read -e dbpass
-echo ""
+echo
 
 hr
 
 # Set up gulp.js?
-echo "Do you want to use npm and gulp? (y/n)"
+echo "Do you want to use npm and gulp? (y/n) "
 read -e npmandgulp
+echo
 
 # Set up bower?
-echo "Do you want to use bower? (y/n)"
+echo "Do you want to use bower? (y/n) "
 read -e bower
+echo
 
 # Set up composer?
-echo "Do you want to use composer? (y/n)"
+echo "Do you want to use composer? (y/n) "
 read -e composer
 
 hr
 
 # add a simple yes/no confirmation before we proceed
-echo "${yellow}Run Install? (y/n)"
+echo "Run Install? (y/n) "
 read -e run
 
 # if the user didn't say no, then go ahead an install
@@ -116,11 +117,9 @@ if [ "$run" == n ] ; then
 	exit
 fi
 
-#clear
-hr
-
 # download the WordPress core files
 wp core download
+echo
 
 echo "Creating config file..."
 # create the wp-config file with our standard setup
@@ -128,6 +127,7 @@ wp core config --dbname=$dbname --dbuser=$dbuser --dbpass=$dbpass --skip-check -
 define( 'WP_DEBUG', true );
 define( 'DISALLOW_FILE_EDIT', true );
 PHP
+echo
 
 # parse the current directory name
 currentdirectory=${pwd##*/}
@@ -142,12 +142,19 @@ currentdirectory=${pwd##*/}
 #wp db create
 echo "Running install..."
 wp core install --url="http://$urlpath" --title="$sitename" --admin_user="$wpuser" --admin_password="$pass" --admin_email="$admin_email"
+echo
 
+echo "Blocking search engines..."
 # discourage search engines
 wp option update blog_public 0
+echo
 
+echo "Deleting sample pages..."
 # delete sample page, and create homepage
 wp post delete $(wp post list --post_type=page --posts_per_page=1 --post_status=publish --pagename="sample-page" --field=ID --format=ids)
+echo
+
+echo "Creating home page..."
 wp post create --post_type=page --post_title=Home --post_status=publish --post_author=$(wp user get $wpuser --field=ID --format=ids)
 
 # set homepage as front page
@@ -155,21 +162,29 @@ wp option update show_on_front 'page'
 
 # set homepage to be the new page
 wp option update page_on_front $(wp post list --post_type=page --post_status=publish --posts_per_page=1 --pagename=home --field=ID --format=ids)
+echo
 
+echo "Creating additional pages..."
 # create all of the pages
 export IFS=","
 for page in $allpages; do
 	wp post create --post_type=page --post_status=publish --post_author=$(wp user get $wpuser --field=ID --format=ids) --post_title="$(echo $page | sed -e 's/^ *//' -e 's/ *$//')"
 done
+echo
 
 # Delete sample post
+echo "Deleting sample post..."
 wp post delete 1 --force
+echo
 
 # set pretty urls
+echo "Setting up pretty urls..."
 wp rewrite structure '/%postname%/'
 wp rewrite flush
+echo
 
 # delete hello dolly
+echo "Deleting hello dolly plugin..."
 wp plugin delete hello
 
 wp plugin install wordpress-seo --activate
@@ -179,8 +194,11 @@ wp plugin install https://github.com/wp-sync-db/wp-sync-db/archive/1.5.zip --act
 wp plugin install https://github.com/wp-sync-db/wp-sync-db-media-files/archive/1.1.4b1.zip --activate
 
 # Install lambda-press theme from a remote zip file
+echo "Downloading and installing theme from GitHub..."
 wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+echo
 
+echo "Creating menu..."
 # create a navigation bar
 wp menu create "Main Navigation"
 
@@ -190,34 +208,39 @@ for pageid in $(wp post list --order="ASC" --orderby="date" --post_type=page --p
 	wp menu item add-post main-navigation $pageid
 done
 
+hr
+
 # Install bower dependencies.
 if [ "$bower" == y ] || [ "$composer" == y ] || [ "$npmandgulp" == y ] ; then
 	# Change to the theme that contains gulpfile.js
 	cd wp-content/themes/lambda-press-master
 	echo "Changing directories to:"
 	pwd
-
-	bower install
+	echo
 fi
 
 # Install bower dependencies.
 if [ "$bower" == y ] ; then
+	echo "Installing Bower packages..."
 	bower install --quiet
+	echo "Done!"
+	echo
 fi
 
 # Install composer dependencies.
 if [ "$composer" == y ] ; then
+	echo "Installing Composer packages..."
 	composer install --quiet
+	echo "Done!"
+	echo
 fi
 
 # Install gulp.js dependencies and start the gulp server.
 if [ "$npmandgulp" == y ] ; then
-
 	# Install npm dependencies.
+	echo "Installing NPM packages..."
 	npm install --quiet
-
-	echo "Finished npm install :)"
-
+	echo "Done!"
 fi
 
 hr
