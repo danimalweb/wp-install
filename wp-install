@@ -9,108 +9,135 @@
 # 2: Bash
 ##
 
-hr ()
-{
-  echo ""
-	echo "==============================================================================="
-	echo ""
-}
-
-clear
-
 # Set up the shell variables for colors
 # http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 yellow=`tput setaf 3`;
 green=`tput setaf 2`;
+red=`tput setaf 1`;
 clear=`tput sgr0`;
 
-echo ""
-echo "###########"
-echo "## WAIT! ##"
-echo "###########"
-echo ""
-echo "  Make sure you have..."
-echo ""
-echo "  1. Created a database"
-echo ""
-echo "  All done?"
-echo ""
-echo "  Press ENTER to continue, CTRL+C to quit..."
-read foo
+function hr ()
+{
+	echo ""
+	echo "-------------------------------------------------------------------------------"
+	echo ""
+}
 
-hr
+function title {
+	echo -n "${green}$1${clear}"
+}
+
+function error {
+	echo -n "${red}$1${clear}"
+}
+
+function question {
+	echo -n "${yellow}$1${clear}"
+}
+
+if [ ! command -v foo >/dev/null 2>&1 ]
+then
+	error "wp-cli is not installed."
+	echo
+	exit
+fi
+
+# Get install dir from command line - default to current directory
+target_dir=${1:-"."}
+
+# Check target exists
+if [ ! -d $target_dir ]
+then
+	error "Target directory is does not exist."
+	exit
+fi
+
+cd $target_dir
+
+
+if (whiptail --title "First thing's first" --yesno "Have you already created a database?" 10 40) then
+	clear
+	title "Ok. Now we need some details."
+	echo
+	echo
+else
+	error "You need to create a database first."
+	echo
+	exit
+fi
+
 
 # accept the name of our website
-echo "Enter site name:"
+question "Site name: "
 read -e sitename
-echo
 
 # accept site url
-echo "Enter the url of your install"
-echo "Example: dev.myside.local"
+question "Enter the url of your install (e.g. example.com): "
 read -e urlpath
-echo
 
 hr
 
-# accept admin username
-echo "Admin username:"
-read -e wpuser
-echo
-
-# accept admin password
-echo "Admin Password:"
-read -e pass
+title "Admin credentials"
 echo
 
 # accept admin email
-echo "Admin email address:"
+question "Admin email address: "
 read -e admin_email
+
+# accept admin username
+question "Admin username: "
+read -e wpuser
+
+# accept admin password
+question "Admin Password: "
+read -e pass
+
+hr
+
+title "Database Details"
+echo
+
+# accept user input for the database name
+question "Database Name: "
+read -e dbname
+
+# accept user input for the databse user
+question "Database Username: "
+read -e dbuser
+
+# accept user input for the databse password
+question "Database Password: "
+read -e dbpass
 
 hr
 
 # accept a comma separated list of pages
-echo "Add a comma separated list of pages that you want in your site:"
+title "Add a comma separated list of pages that you want in your site: "
 read -e allpages
 
 hr
 
-# accept user input for the databse name
-echo "Database Name:"
-read -e dbname
-echo
-
-# accept user input for the databse user
-echo "Database Username:"
-read -e dbuser
-echo
-
-# accept user input for the databse password
-echo "Database Password:"
-read -e dbpass
-echo
-
-hr
-
 # Set up gulp.js?
-echo "Do you want to use npm and gulp? (y/n) "
+question "Do you want to use npm and gulp? (Y/n) "
 read -e npmandgulp
-echo
+npmandgulp=${npmandgulp:-Y}
 
 # Set up bower?
-echo "Do you want to use bower? (y/n) "
+question "Do you want to use bower? (Y/n) "
 read -e bower
-echo
+bower=${bower:-Y}
 
 # Set up composer?
-echo "Do you want to use composer? (y/n) "
+question "Do you want to use composer? (Y/n) "
 read -e composer
+composer=${composer:-Y}
 
 hr
 
 # add a simple yes/no confirmation before we proceed
-echo "Run Install? (y/n) "
+question "Run Install? (Y/n) "
 read -e run
+run=${run:-Y}
 
 # if the user didn't say no, then go ahead an install
 if [ "$run" == n ] ; then
@@ -121,7 +148,9 @@ fi
 wp core download
 echo
 
-echo "Creating config file..."
+title "Creating config file..."
+echo
+
 # create the wp-config file with our standard setup
 wp core config --dbname=$dbname --dbuser=$dbuser --dbpass=$dbpass --skip-check --extra-php <<PHP
 define( 'WP_DEBUG', true );
@@ -140,21 +169,25 @@ currentdirectory=${pwd##*/}
 
 # create database, and install WordPress
 #wp db create
-echo "Running install..."
+title "Running install..."
+echo
 wp core install --url="http://$urlpath" --title="$sitename" --admin_user="$wpuser" --admin_password="$pass" --admin_email="$admin_email"
 echo
 
-echo "Blocking search engines..."
+title "Blocking search engines..."
+echo
 # discourage search engines
 wp option update blog_public 0
 echo
 
-echo "Deleting sample pages..."
+title "Deleting sample pages..."
+echo
 # delete sample page, and create homepage
 wp post delete $(wp post list --post_type=page --posts_per_page=1 --post_status=publish --pagename="sample-page" --field=ID --format=ids)
 echo
 
-echo "Creating home page..."
+title "Creating home page..."
+echo
 wp post create --post_type=page --post_title=Home --post_status=publish --post_author=$(wp user get $wpuser --field=ID --format=ids)
 
 # set homepage as front page
@@ -164,7 +197,9 @@ wp option update show_on_front 'page'
 wp option update page_on_front $(wp post list --post_type=page --post_status=publish --posts_per_page=1 --pagename=home --field=ID --format=ids)
 echo
 
-echo "Creating additional pages..."
+title "Creating additional pages..."
+echo
+echo
 # create all of the pages
 export IFS=","
 for page in $allpages; do
@@ -173,23 +208,30 @@ done
 echo
 
 # Delete sample post
-echo "Deleting sample post..."
+title "Deleting sample post..."
+echo
 wp post delete 1 --force
 echo
 
 # set pretty urls
-echo "Setting up pretty urls..."
+title "Setting up pretty urls..."
+echo
 wp rewrite structure '/%postname%/'
 wp rewrite flush
 echo
 
 # delete hello dolly
-echo "Deleting hello dolly plugin..."
+title "Deleting hello dolly plugin..."
+echo
 wp plugin delete hello
 
 hr
 
-read -r -p "Do you want to install Yoast SEO? (y/n) " response
+# Yoast SEO
+question "Install Yoast SEO? (Y/n) "
+read -e response
+response=${response:-Y}
+
 if [[ $response =~ ^[Yy]$ ]]
 then
 	wp plugin install wordpress-seo --activate
@@ -197,7 +239,10 @@ fi
 unset response
 echo
 
-read -r -p "Do you want to install Regenerate Thumbnails? (y/n) " response
+# Regerate Thumbnails
+question "Install Regenerate Thumbnails? (Y/n) "
+read -e response
+response=${response:-Y}
 if [[ $response =~ ^[Yy]$ ]]
 then
 	wp plugin install regenerate-thumbnails --activate
@@ -205,8 +250,9 @@ fi
 unset response
 echo
 
-echo
-read -r -p "Do you want to install Contact Form 7? (y/n) " response
+question "Install Contact Form 7? (Y/n) "
+read -e response
+response=${response:-Y}
 if [[ $response =~ ^[Yy]$ ]]
 then
 	wp plugin install contact-form-7 --activate
@@ -215,7 +261,9 @@ unset response
 echo
 
 echo
-read -r -p "Do you want to install WordPress Sync DB? (y/n) " response
+question "Install WordPress Sync DB? (Y/n) "
+read -e response
+response=${response:-Y}
 if [[ $response =~ ^[Yy]$ ]]
 then
 	wp plugin install https://github.com/wp-sync-db/wp-sync-db/archive/1.5.zip --activate
@@ -227,11 +275,18 @@ echo
 hr
 
 # Install lambda-press theme from a remote zip file
-echo "Downloading and installing theme from GitHub..."
-wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+echo
+question "Install LambdaPress theme? (Y/n) "
+read -e response
+response=${response:-Y}
+if [[ $response =~ ^[Yy]$ ]]
+then
+	title "Downloading and installing theme from GitHub..."
+	wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+fi
 echo
 
-echo "Creating menu..."
+title "Creating menu..."
 # create a navigation bar
 wp menu create "Main Navigation"
 
@@ -247,42 +302,49 @@ hr
 if [ "$bower" == y ] || [ "$composer" == y ] || [ "$npmandgulp" == y ] ; then
 	# Change to the theme that contains gulpfile.js
 	cd wp-content/themes/lambda-press-master
-	echo "Changing directories to:"
+	title "Changing directories to:"
 	pwd
 	echo
 fi
 
 # Install bower dependencies.
 if [ "$bower" == y ] ; then
-	echo "Installing Bower packages..."
+	title "Installing Bower packages..."
+	echo
 	bower install --quiet
-	echo "Done!"
+	title "Done!"
 	echo
 fi
 
 # Install composer dependencies.
 if [ "$composer" == y ] ; then
-	echo "Installing Composer packages..."
+	title "Installing Composer packages..."
+	echo
 	composer install --quiet
-	echo "Done!"
+	title "Done!"
 	echo
 fi
 
 # Install gulp.js dependencies and start the gulp server.
 if [ "$npmandgulp" == y ] ; then
 	# Install npm dependencies.
-	echo "Installing NPM packages..."
+	title "Installing NPM packages..."
+	echo
 	npm install --quiet
-	echo "Done!"
+	title "Done!"
 fi
 
 hr
 
-echo "Installation is complete. :)"
+title "Installation is complete. :)"
 echo ""
-echo "Website: http://"$urlpath
-echo "Admin: http://"$urlpath"/wp-admin"
-echo "Username: $wpuser"
-echo "Password: $pass"
+title "Website: "
+echo "http://"$urlpath
+title "Admin: "
+echo "http://"$urlpath"/wp-admin"
+title "Username: "
+echo "$wpuser"
+title "Password: "
+echo "$pass"
 
 hr
