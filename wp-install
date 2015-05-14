@@ -244,8 +244,8 @@ else
 	echo ""
 	echo "Installation is complete. :)"
 	echo ""
-	echo "Website: http://"${urlpath}
-	echo "Admin: http://"${urlpath}"/wp-admin"
+	echo "Website: http://"$urlpath
+	echo "Admin: http://"$urlpath"/wp-admin"
 	echo "Username: $wpuser"
 	echo "Password: $pass"
 	echo ""
