@@ -199,7 +199,6 @@ echo
 
 title "Creating additional pages..."
 echo
-echo
 # create all of the pages
 export IFS=","
 for page in $allpages; do
@@ -285,8 +284,41 @@ response=${response:-Y}
 if [[ $response =~ ^[Yy]$ ]]
 then
 	title "Downloading and installing theme from GitHub..."
-	wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+	#wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+	wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip
 	theme_dir=wp-content/themes/lambda-press-master
+
+	# Rename theme?
+
+	question "Set theme name to site title name? (Y/n) "
+	read -e response
+	response=${response:-Y}
+	if [[ $response =~ ^[Yy]$ ]]
+	then
+		title "Renaming theme folder..."
+		folder_name=${sitename// /-}
+		folder_name=${folder_name,,}
+
+		mydir=`pwd`
+		mv -f $mydir/$theme_dir $mydir/wp-content/themes/$folder_name
+
+		theme_dir=wp-content/themes/$folder_name
+		echo "Done!"
+		echo
+
+		title "Updating theme title..."
+		# Change the newly cloned theme style.css to the site's name so it displays
+		# correctly in the Dashboard.
+		themename_old='  Theme Name: Lambda Press'
+		themename_new='  Theme Name: '$sitename
+
+		sed -i.bak "s/${themename_old}/${themename_new}/g" "${mydir}/${theme_dir}/style.css"
+		echo "Done!"
+		echo
+
+		title "Activating theme..."
+		wp theme activate ${folder_name}
+	fi
 else
 	theme_dir="wp-content/themes/${default_theme_dir}"
 fi
