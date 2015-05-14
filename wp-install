@@ -9,6 +9,8 @@
 # 2: Bash
 ##
 
+default_theme_dir=twentyfifteen
+
 # Set up the shell variables for colors
 # http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 yellow=`tput setaf 3`;
@@ -35,19 +37,17 @@ function question {
 	echo -n "${yellow}$1${clear}"
 }
 
-if [ ! command -v foo >/dev/null 2>&1 ]
-then
+if [ ! -x "$(command -v wp)" ]; then
 	error "wp-cli is not installed."
 	echo
-	exit
+	exit 1
 fi
 
 # Get install dir from command line - default to current directory
 target_dir=${1:-"."}
 
 # Check target exists
-if [ ! -d $target_dir ]
-then
+if [ ! -d $target_dir ]; then
 	error "Target directory is does not exist."
 	exit
 fi
@@ -227,6 +227,7 @@ wp plugin delete hello
 
 hr
 
+
 # Yoast SEO
 question "Install Yoast SEO? (Y/n) "
 read -e response
@@ -239,6 +240,7 @@ fi
 unset response
 echo
 
+
 # Regerate Thumbnails
 question "Install Regenerate Thumbnails? (Y/n) "
 read -e response
@@ -250,6 +252,8 @@ fi
 unset response
 echo
 
+
+# Contact Form 7
 question "Install Contact Form 7? (Y/n) "
 read -e response
 response=${response:-Y}
@@ -260,7 +264,8 @@ fi
 unset response
 echo
 
-echo
+
+# Wordpress Sync DB
 question "Install WordPress Sync DB? (Y/n) "
 read -e response
 response=${response:-Y}
@@ -272,10 +277,8 @@ fi
 unset response
 echo
 
-hr
 
 # Install lambda-press theme from a remote zip file
-echo
 question "Install LambdaPress theme? (Y/n) "
 read -e response
 response=${response:-Y}
@@ -283,6 +286,9 @@ if [[ $response =~ ^[Yy]$ ]]
 then
 	title "Downloading and installing theme from GitHub..."
 	wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
+	theme_dir=wp-content/themes/lambda-press-master
+else
+	theme_dir="wp-content/themes/${default_theme_dir}"
 fi
 echo
 
@@ -299,45 +305,63 @@ done
 hr
 
 # Install bower dependencies.
-if [ "$bower" == y ] || [ "$composer" == y ] || [ "$npmandgulp" == y ] ; then
+if [[ $bower =~ ^[Yy]$ ]] || [[ $composer =~ ^[Yy]$ ]] || [[ $npmandgulp =~ ^[Yy]$ ]] ; then
 	# Change to the theme that contains gulpfile.js
-	cd wp-content/themes/lambda-press-master
+	cd $theme_dir
 	title "Changing directories to:"
 	pwd
 	echo
 fi
 
 # Install bower dependencies.
-if [ "$bower" == y ] ; then
-	title "Installing Bower packages..."
-	echo
-	bower install --quiet
+if [[ $bower =~ ^[Yy]$ ]]; then
+	if [ -a bower.json ]; then
+		title "Installing Bower packages..."
+		echo
+		bower install --quiet
+	else
+		title "Running Bower init..."
+		echo
+		bower init
+	fi
 	title "Done!"
 	echo
 fi
 
 # Install composer dependencies.
-if [ "$composer" == y ] ; then
-	title "Installing Composer packages..."
-	echo
-	composer install --quiet
+if [[ $composer =~ ^[Yy]$ ]]; then
+	if [ -a composer.json ]; then
+		title "Installing Composer packages..."
+		echo
+		composer install --quiet
+	else
+		title "Running Composer init..."
+		echo
+		# composer init
+	fi
 	title "Done!"
 	echo
 fi
 
 # Install gulp.js dependencies and start the gulp server.
-if [ "$npmandgulp" == y ] ; then
-	# Install npm dependencies.
-	title "Installing NPM packages..."
-	echo
-	npm install --quiet
+if [[ $npmandgulp =~ ^[Yy]$ ]] ; then
+	if [ -a package.json ]; then
+		title "Installing NPM packages..."
+		echo
+		npm install --quiet
+	else
+		title "Running NPM init..."
+		echo
+		npm init
+	fi
 	title "Done!"
 fi
 
 hr
 
 title "Installation is complete. :)"
-echo ""
+echo
+echo
 title "Website: "
 echo "http://"$urlpath
 title "Admin: "
