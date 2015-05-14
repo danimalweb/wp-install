@@ -1,4 +1,4 @@
-# yadlam-wp-install-script
+# wp-install
 
 Bash script for easily installing WP with additional dependencies.
 
@@ -22,3 +22,19 @@ Copy `wp-install` to somewhere on your `path`. `/usr/bin` might be a good choice
  1. `wp-install`
  2. Follow instructions
  3. Appreciate free time
+
+
+# Features #
+
+	- Comes with options to install common plugins
+		- Yoast SEO
+		- Regenerate Thumbnails
+		- Contact Form 7
+		- Wordpress Sync DB
+	- Supports NPM, Bower and Composer
+	- Automatically blocks search engine spiders
+	- Deletes sample posts and pages
+	- Create and assigns home page
+	- Creates additional pages
+	- Sets up pretty urls
+	- Deletes hello dolly plugin
