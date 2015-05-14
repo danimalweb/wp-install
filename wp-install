@@ -202,13 +202,11 @@ fi
 
 # Install bower dependencies.
 if [ "$bower" == y ] ; then
-	bower install
 	bower install --quiet
 fi
 
 # Install composer dependencies.
 if [ "$composer" == y ] ; then
-	composer install
 	composer install --quiet
 fi
 
@@ -216,7 +214,6 @@ fi
 if [ "$npmandgulp" == y ] ; then
 
 	# Install npm dependencies.
-	npm install --loglevel warn
 	npm install --quiet
 
 	echo "Finished npm install :)"
