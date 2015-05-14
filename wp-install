@@ -91,7 +91,13 @@ read -e wpuser
 # accept admin password
 question "Admin Password: "
 read -e pass
-
+if [[ -z "$var" ]]
+	then
+  echo "Generating a random password..."
+	# generate random 12 character password
+	pass=$(LC_CTYPE=C tr -dc A-Za-z0-9_\!\@\#\$\%\^\&\*\(\)-+= < /dev/urandom | head -c 12)
+	echo "Admin Password is: ${pass}"
+fi
 hr
 
 title "Database Details"
@@ -157,12 +163,6 @@ define( 'WP_DEBUG', true );
 define( 'DISALLOW_FILE_EDIT', true );
 PHP
 echo
-
-# parse the current directory name
-currentdirectory=${pwd##*/}
-
-# generate random 12 character password
-password=$(LC_CTYPE=C tr -dc A-Za-z0-9_\!\@\#\$\%\^\&\*\(\)-+= < /dev/urandom | head -c 12)
 
 # parse the current directory name
 currentdirectory=${pwd##*/}
