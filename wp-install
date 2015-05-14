@@ -317,6 +317,7 @@ then
 		echo
 
 		title "Activating theme..."
+		echo
 		wp theme activate ${folder_name}
 	fi
 else
@@ -324,7 +325,6 @@ else
 fi
 echo
 
-title "Creating menu..."
 # Removes the inactive themes that come wth an fresh installation of WP.
 # WP needs one active theme, this command removes the inactive ones.
 title "Deleting inactive themes..."
@@ -332,6 +332,8 @@ echo
 wp theme list --status=inactive --field=name | while read THEME; do wp theme delete $THEME; done;
 
 # create a navigation bar
+title "Creating menu..."
+echo
 wp menu create "Main Navigation"
 
 # add pages to navigation
