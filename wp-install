@@ -1,5 +1,5 @@
 #!/bin/bash
-##
+
 # WP install script
 #
 # Simple bash script to automate installation of WordPress with some settings.
@@ -8,6 +8,14 @@
 # 1: WP-CLI
 # 2: Bash
 ##
+
+hr ()
+{
+  echo ""
+	echo "==============================================================================="
+	echo ""
+}
+
 clear
 
 # Set up the shell variables for colors
@@ -16,82 +24,92 @@ yellow=`tput setaf 3`;
 green=`tput setaf 2`;
 clear=`tput sgr0`;
 
-# Start it up ...
-echo "${green}"
-echo "============================================"
 echo ""
-echo "Begin install"
+echo "###########"
+echo "## WAIT! ##"
+echo "###########"
 echo ""
-echo "============================================"
-echo "${clear}"
+echo "  Make sure you have..."
+echo ""
+echo "  1. Created a database"
+echo ""
+echo "  All done?"
+echo ""
+echo "  Press ENTER to continue, CTRL+C to quit..."
+read foo
+
+hr
 
 # accept the name of our website
-echo "${yellow}Site Name:${clear}"
+echo "Enter site name:"
 read -e sitename
 echo ""
 
+# accept site url
+echo "Enter the url of your install"
+echo "Example: dev.myside.local"
+read -e urlpath
+echo ""
+
+hr
+
 # accept admin username
-echo "${yellow}Admin Username:${clear}"
+echo "Admin username:"
 read -e wpuser
 echo ""
 
 # accept admin password
-echo "${yellow}Admin Password:${clear}"
+echo "Admin Password:"
 read -e pass
 echo ""
 
 # accept admin email
-echo "${yellow}Admin email:${clear}"
+echo "Admin email address:"
 read -e admin_email
 echo ""
 
+hr
+
 # accept a comma separated list of pages
-echo "${yellow}Add a comma separated list of pages that you want in your site:${clear}"
+echo "Add a comma separated list of pages that you want in your site:"
 read -e allpages
-echo ""
+
+hr
 
 # accept user input for the databse name
-echo "${yellow}Database Name:${clear}"
+echo "Database Name:"
 read -e dbname
 echo ""
 
 # accept user input for the databse user
-echo "${yellow}Database User:${clear}"
+echo "Database Username:"
 read -e dbuser
 echo ""
 
 # accept user input for the databse password
-echo "${yellow}Database Password:${clear}"
+echo "Database Password:"
 read -e dbpass
 echo ""
 
+hr
+
 # Set up gulp.js?
-echo "${yellow}Do you want to use npm and gulp? (y/n)${clear}"
+echo "Do you want to use npm and gulp? (y/n)"
 read -e npmandgulp
-echo ""
 
 # Set up bower?
-echo "${yellow}Do you want to use bower? (y/n)${clear}"
+echo "Do you want to use bower? (y/n)"
 read -e bower
-echo ""
 
 # Set up composer?
-echo "${yellow}Do you want to use composer? (y/n)${clear}"
+echo "Do you want to use composer? (y/n)"
 read -e composer
-echo ""
 
-if [ "$npmandgulp" == y ] ; then
-	# add a simple yes/no confirmation before we proceed
-	echo "${yellow}What is the url of your install?${clear}"
-	echo "${yellow}Example: dev.myside.local${clear}"
-	read -e urlpath
-	echo ""
-fi
+hr
 
 # add a simple yes/no confirmation before we proceed
-echo "${yellow}Run Install? (y/n)${clear}"
+echo "${yellow}Run Install? (y/n)"
 read -e run
-echo ""
 
 # if the user didn't say no, then go ahead an install
 if [ "$run" == n ] ; then
@@ -99,12 +117,12 @@ if [ "$run" == n ] ; then
 fi
 
 #clear
-echo ""
+hr
 
 # download the WordPress core files
 wp core download
 
-echo "${yellow}Creating config file...${clear}"
+echo "Creating config file..."
 # create the wp-config file with our standard setup
 wp core config --dbname=$dbname --dbuser=$dbuser --dbpass=$dbpass --skip-check --extra-php <<PHP
 define( 'WP_DEBUG', true );
@@ -112,20 +130,17 @@ define( 'DISALLOW_FILE_EDIT', true );
 PHP
 
 # parse the current directory name
-currentdirectory=${PWD##*/}
+currentdirectory=${pwd##*/}
 
 # generate random 12 character password
 password=$(LC_CTYPE=C tr -dc A-Za-z0-9_\!\@\#\$\%\^\&\*\(\)-+= < /dev/urandom | head -c 12)
 
-# copy password to clipboard
-echo $password | pbcopy
-
 # parse the current directory name
-currentdirectory=${PWD##*/}
+currentdirectory=${pwd##*/}
 
 # create database, and install WordPress
 #wp db create
-echo "${yellow}Run install...${clear}"
+echo "Running install..."
 wp core install --url="http://$urlpath" --title="$sitename" --admin_user="$wpuser" --admin_password="$pass" --admin_email="$admin_email"
 
 # discourage search engines
@@ -157,9 +172,6 @@ wp rewrite flush
 # delete hello dolly
 wp plugin delete hello
 
-# Install jetpack
-# wp plugin install jetpack
-
 wp plugin install wordpress-seo --activate
 wp plugin install regenerate-thumbnails --activate
 wp plugin install contact-form-7 --activate
@@ -179,76 +191,42 @@ for pageid in $(wp post list --order="ASC" --orderby="date" --post_type=page --p
 done
 
 # Install bower dependencies.
-if [ "$bower" == y ] ; then
+if [ "$bower" == y ] || [ "$composer" == y ] || [ "$npmandgulp" == y ] ; then
 	# Change to the theme that contains gulpfile.js
 	cd wp-content/themes/lambda-press-master
-	echo ""
-	echo "${yellow}Changing directories to:${clear}"
+	echo "Changing directories to:"
 	pwd
-	echo ""
 
+	bower install
+fi
+
+# Install bower dependencies.
+if [ "$bower" == y ] ; then
 	bower install
 fi
 
 # Install composer dependencies.
 if [ "$composer" == y ] ; then
-	# Change to the theme that contains gulpfile.js
-	cd wp-content/themes/lambda-press-master
-	echo ""
-	echo "${yellow}Changing directories to:${clear}"
-	pwd
-	echo ""
-
 	composer install
 fi
 
 # Install gulp.js dependencies and start the gulp server.
 if [ "$npmandgulp" == y ] ; then
 
-	# Change to the theme that contains gulpfile.js
-	cd wp-content/themes/lambda-press-master
-	echo ""
-	echo "${yellow}Changing directories to:${clear}"
-	pwd
-	echo ""
-
 	# Install npm dependencies.
 	npm install --loglevel warn
-	echo ""
-	echo "${yellow}Finished npm install :)${clear}"
 
-	# Set up path for Browsersync.
-	sed -i ".bak" "s/$urlpath/" gulpfile.js;
-	echo "${yellow}Changing URL path to 127.0.0.1/${urlpath} ${clear}"
-	echo ""
-	echo "${green}"
-	echo "================================================================="
-	echo ""
-	echo "Installation is complete. :)"
-	echo ""
-	echo "Username: $wpuser"
-	echo "Password: $pass"
-	echo ""
-	echo "================================================================="
-	echo ""
+	echo "Finished npm install :)"
 
-	# Start the gulp server. Loads site in browser.
-	#echo "${yellow}Starting the gulp server.${clear}"
-	#echo "${clear}"
-	#gulp
-else
-	#clear
-
-	echo "${green}"
-	echo "================================================================="
-	echo ""
-	echo "Installation is complete. :)"
-	echo ""
-	echo "Website: http://"$urlpath
-	echo "Admin: http://"$urlpath"/wp-admin"
-	echo "Username: $wpuser"
-	echo "Password: $pass"
-	echo ""
-	echo "================================================================="
-	echo "${clear}"
 fi
+
+hr
+
+echo "Installation is complete. :)"
+echo ""
+echo "Website: http://"$urlpath
+echo "Admin: http://"$urlpath"/wp-admin"
+echo "Username: $wpuser"
+echo "Password: $pass"
+
+hr
