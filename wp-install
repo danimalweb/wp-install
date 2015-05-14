@@ -187,11 +187,44 @@ echo
 echo "Deleting hello dolly plugin..."
 wp plugin delete hello
 
-wp plugin install wordpress-seo --activate
-wp plugin install regenerate-thumbnails --activate
-wp plugin install contact-form-7 --activate
-wp plugin install https://github.com/wp-sync-db/wp-sync-db/archive/1.5.zip --activate
-wp plugin install https://github.com/wp-sync-db/wp-sync-db-media-files/archive/1.1.4b1.zip --activate
+hr
+
+read -r -p "Do you want to install Yoast SEO? (y/n) " response
+if [[ $response =~ ^[Yy]$ ]]
+then
+	wp plugin install wordpress-seo --activate
+fi
+unset response
+echo
+
+read -r -p "Do you want to install Regenerate Thumbnails? (y/n) " response
+if [[ $response =~ ^[Yy]$ ]]
+then
+	wp plugin install regenerate-thumbnails --activate
+fi
+unset response
+echo
+
+echo
+read -r -p "Do you want to install Contact Form 7? (y/n) " response
+if [[ $response =~ ^[Yy]$ ]]
+then
+	wp plugin install contact-form-7 --activate
+fi
+unset response
+echo
+
+echo
+read -r -p "Do you want to install WordPress Sync DB? (y/n) " response
+if [[ $response =~ ^[Yy]$ ]]
+then
+	wp plugin install https://github.com/wp-sync-db/wp-sync-db/archive/1.5.zip --activate
+	wp plugin install https://github.com/wp-sync-db/wp-sync-db-media-files/archive/1.1.4b1.zip --activate
+fi
+unset response
+echo
+
+hr
 
 # Install lambda-press theme from a remote zip file
 echo "Downloading and installing theme from GitHub..."
