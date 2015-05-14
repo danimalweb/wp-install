@@ -342,6 +342,20 @@ for pageid in $(wp post list --order="ASC" --orderby="date" --post_type=page --p
 	wp menu item add-post main-navigation $pageid
 done
 
+echo
+
+# Custom Post Types
+question "Number of custom post types: (0) "
+read -e cpt_count
+cpt_count=${cpt_count:-0}
+for ((i = 1; i <= cpt_count; i++)); do
+	question "(${i}) Custom post type name: "
+	read -e response
+	wp scaffold post-type ${response} --theme
+	echo
+	unset response
+done
+
 hr
 
 # Install bower dependencies.
