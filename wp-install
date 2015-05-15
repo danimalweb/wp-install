@@ -66,6 +66,11 @@ else
 	exit
 fi
 
+# get the directory of the bash script
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+#include config file
+. "${DIR}/config.cfg"
 
 # accept the name of our website
 question "Site name: "
@@ -82,11 +87,11 @@ echo
 
 # accept admin email
 question "Admin email address: "
-read -e admin_email
+read -i ${admin_email} -e admin_email
 
 # accept admin username
 question "Admin username: "
-read -e wpuser
+read -i ${wpuser} -e wpuser
 
 # accept admin password
 question "Admin Password: "
@@ -119,7 +124,7 @@ hr
 
 # accept a comma separated list of pages
 title "Add a comma separated list of pages that you want in your site: "
-read -e allpages
+read -i ${default_pages} -e default_pages
 
 hr
 
@@ -201,7 +206,7 @@ title "Creating additional pages..."
 echo
 # create all of the pages
 export IFS=","
-for page in $allpages; do
+for page in $default_pages; do
 	wp post create --post_type=page --post_status=publish --post_author=$(wp user get $wpuser --field=ID --format=ids) --post_title="$(echo $page | sed -e 's/^ *//' -e 's/ *$//')"
 done
 echo
