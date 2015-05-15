@@ -281,54 +281,56 @@ fi
 unset response
 echo
 
-
-# Install lambda-press theme from a remote zip file
-question "Install LambdaPress theme? (Y/n) "
-read -e response
-response=${response:-Y}
-if [[ $response =~ ^[Yy]$ ]]
+if [[ ! -z "$default_theme_name" ]]
 then
-	title "Downloading and installing theme from GitHub..."
-	#wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip --activate
-	wp theme install https://github.com/danimalweb/lambda-press/archive/master.zip
-	theme_dir=wp-content/themes/lambda-press-master
-
-	# Rename theme?
-
-	question "Set theme name to site title name? (Y/n) "
+	question "Install ${default_theme_name} theme? (Y/n) "
 	read -e response
 	response=${response:-Y}
 	if [[ $response =~ ^[Yy]$ ]]
-	then
-		title "Renaming theme folder..."
-		folder_name=${sitename// /-}
-		folder_name=${folder_name,,}
+		then
+		title "Downloading and installing theme from ${default_theme_url}..."
+		wp theme install ${default_theme_url}
+		theme_folder=$(ls -t wp-content/themes | head -1)
+		theme_dir=wp-content/themes/${theme_folder}
 
-		mydir=`pwd`
-		mv -f $mydir/$theme_dir $mydir/wp-content/themes/$folder_name
+		# Rename theme?
+		question "Set theme name to site title name? (Y/n) "
+		read -e response
+		response=${response:-Y}
+		if [[ $response =~ ^[Yy]$ ]]
+		then
+			title "Renaming theme folder..."
+			folder_name=${sitename// /-}
+			folder_name=${folder_name,,}
 
-		theme_dir=wp-content/themes/$folder_name
-		echo "Done!"
-		echo
+			mydir=`pwd`
+			mv -f $mydir/$theme_dir $mydir/wp-content/themes/$folder_name
 
-		title "Updating theme title..."
-		# Change the newly cloned theme style.css to the site's name so it displays
-		# correctly in the Dashboard.
-		themename_old='  Theme Name: Lambda Press'
-		themename_new='  Theme Name: '$sitename
+			theme_dir=wp-content/themes/$folder_name
+			echo "Done!"
+			echo
 
-		sed -i.bak "s/${themename_old}/${themename_new}/g" "${mydir}/${theme_dir}/style.css"
-		echo "Done!"
-		echo
+			title "Updating theme title..."
+			# Change the newly cloned theme style.css to the site's name so it displays
+			# correctly in the Dashboard.
+			themename_old='  Theme Name: '${default_theme_name}
+			themename_new='  Theme Name: '${sitename}
 
+			sed -i.bak "s/${themename_old}/${themename_new}/g" "${mydir}/${theme_dir}/style.css"
+			echo "Done!"
+			echo
+		fi
+
+		# Activate Theme
 		title "Activating theme..."
 		echo
 		wp theme activate ${folder_name}
+
+	else
+		theme_dir="wp-content/themes/${default_theme_dir}"
 	fi
-else
-	theme_dir="wp-content/themes/${default_theme_dir}"
+	echo
 fi
-echo
 
 # Removes the inactive themes that come wth an fresh installation of WP.
 # WP needs one active theme, this command removes the inactive ones.
