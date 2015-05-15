@@ -357,10 +357,23 @@ read -e cpt_count
 cpt_count=${cpt_count:-0}
 for ((i = 1; i <= cpt_count; i++)); do
 	question "(${i}) Custom post type name: "
-	read -e response
-	wp scaffold post-type ${response} --theme
+	read -e post_type
+	wp scaffold post-type ${post_type} --theme
 	echo
+
+	question "Add taxonomy for this post type? (y/N) "
+	read -e response
+	response=${response:-N}
+	if [[ $response =~ ^[Yy]$ ]]
+		then
+		question "Taxonomy name: "
+		read -e taxonomy
+		wp scaffold taxonomy ${taxonomy} --post_types=${post_type} --theme
+	fi
+
 	unset response
+	unset post_type
+	unset taxonomy
 done
 
 hr
