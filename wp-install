@@ -288,10 +288,10 @@ then
 	response=${response:-Y}
 	if [[ $response =~ ^[Yy]$ ]]
 		then
-		title "Downloading and installing theme from ${default_theme_url}..."
 		wp theme install ${default_theme_url}
 		theme_folder=$(ls -t wp-content/themes | head -1)
 		theme_dir=wp-content/themes/${theme_folder}
+		echo
 
 		# Rename theme?
 		question "Set theme name to site title name? (Y/n) "
@@ -300,6 +300,7 @@ then
 		if [[ $response =~ ^[Yy]$ ]]
 		then
 			title "Renaming theme folder..."
+			echo
 			folder_name=${sitename// /-}
 			folder_name=${folder_name,,}
 
@@ -311,6 +312,7 @@ then
 			echo
 
 			title "Updating theme title..."
+			echo
 			# Change the newly cloned theme style.css to the site's name so it displays
 			# correctly in the Dashboard.
 			themename_old='  Theme Name: '${default_theme_name}
@@ -337,6 +339,7 @@ fi
 title "Deleting inactive themes..."
 echo
 wp theme list --status=inactive --field=name | while read THEME; do wp theme delete $THEME; done;
+echo
 
 # create a navigation bar
 title "Creating menu..."
