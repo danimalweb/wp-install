@@ -73,9 +73,19 @@ question "Site name: "
 read -e sitename
 
 # accept site url
-question "Enter the url of your install (e.g. example.com): "
-read -e urlpath
-
+valid=0;
+regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
+while ((valid==0))
+	do
+	question "Enter the url of your install (e.g. http://mywebsite.com): "
+	read -e urlpath
+	if [[ $urlpath =~ $regex ]]
+		then
+		    valid=1
+		else
+		    echo "Invalid url please try again."
+		fi
+done
 hr
 
 title "Admin credentials"
