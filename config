@@ -1,5 +1,5 @@
 admin_email="daniel@danimalweb.co.uk"
 wpuser="daniel"
 default_pages="About"
-default_theme_url="https://github.com/danimalweb/lambda-press/archive/master.zip"
-default_theme_name="Lambda Press"
+default_theme_url="https://github.com/mrchimp/tofino/archive/master.zip"
+default_theme_name="Tofino"
