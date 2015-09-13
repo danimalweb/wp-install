@@ -5,7 +5,7 @@ Bash script for easily installing WP with additional dependencies.
 
 # Dependencies #
 
- * Whiptail
+ * Bash 4.X
 
 
 # Installation #
