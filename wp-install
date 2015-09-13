@@ -66,11 +66,8 @@ else
 	exit
 fi
 
-# get the directory of the bash script
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
 #include config file
-. "${DIR}/config.cfg"
+. ~/.config/wp-install/config
 
 # accept the name of our website
 question "Site name: "

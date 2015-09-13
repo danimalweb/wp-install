@@ -5,17 +5,14 @@ Bash script for easily installing WP with additional dependencies.
 
 # Dependencies #
 
-### wp-cli ###
-
-You can install the latest version of wp-cli to `/usr/bin` by running `./get-wp-cli`.
+ * Whiptail
 
 
 # Installation #
 
-Copy `wp-install` to somewhere on your `path`. `/usr/bin` might be a good choice.
+    ./install
 
-	sudo cp wp-install /usr/bin/wp-install
-
+Wp-cli will be installed if it doesn't already exist. wp-install will be installed to `/usr/bin`.
 
 # Usage #
 

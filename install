@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Get wp-cli
+echo "Checking for wp-cli..."
+if [ -x "$(command -v wp)" ]; then
+	echo >&2 "wp-cli is already installed! Remove it and re-run this script to get the latest version."
+else
+  echo "Downloading wp-cli... "
+  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  chmod +x wp-cli.phar
+  echo "Moving wp-cli to /usr/bin. You might need to enter a password..."
+  sudo mv wp-cli.phar /usr/bin/wp
+fi
+
+# Create a config file
+if [ ! -e ~/.config/wp-install/config ]; then
+  if [ ! -d ~/.config/wp-install ]; then
+    mkdir ~/.config/wp-install
+  fi
+  echo "Creating config file... "
+  cp config ~/.config/wp-install/config 
+fi
+
+sudo cp wp-install /usr/bin/wp-install
+
+echo "All done!"
+echo
+echo "wp-install is here: /usr/bin/wp-install"
+echo "Config file is here: ~/.config/wp-install/config"
+
