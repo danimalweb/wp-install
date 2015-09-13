@@ -54,17 +54,16 @@ fi
 
 cd $target_dir
 
-
-if (whiptail --title "First thing's first" --yesno "Have you already created a database?" 10 40) then
-	clear
-	title "Ok. Now we need some details."
-	echo
-	echo
-else
-	error "You need to create a database first."
+question "Have you already created a database? (Y/n) "
+read -e response
+response=${response:-n}
+if [[ $response =~ ^[Nn]$ ]]
+then
+	echo "You need to create a database first."
 	echo
 	exit
 fi
+unset response
 
 #include config file
 . ~/.config/wp-install/config
