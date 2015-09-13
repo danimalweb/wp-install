@@ -182,7 +182,7 @@ currentdirectory=${pwd##*/}
 #wp db create
 title "Running install..."
 echo
-wp core install --url="http://$urlpath" --title="$sitename" --admin_user="$wpuser" --admin_password="$pass" --admin_email="$admin_email"
+wp core install --url="$urlpath" --title="$sitename" --admin_user="$wpuser" --admin_password="$pass" --admin_email="$admin_email"
 echo
 
 title "Blocking search engines..."
@@ -446,9 +446,9 @@ title "Installation is complete. :)"
 echo
 echo
 title "Website: "
-echo "http://"$urlpath
+echo $urlpath
 title "Admin: "
-echo "http://"$urlpath"/wp-admin"
+echo $urlpath"/wp-admin"
 title "Username: "
 echo "$wpuser"
 title "Password: "
