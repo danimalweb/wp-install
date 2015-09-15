@@ -238,6 +238,19 @@ wp plugin delete hello
 hr
 
 
+#SVG Support
+question "Install SVG Support? (Y/n) "
+read -e response
+response=${response:-Y}
+
+if [[ $response =~ ^[Yy]$ ]]
+then
+	wp plugin install svg-support --activate
+fi
+unset response
+echo
+
+
 # Yoast SEO
 question "Install Yoast SEO? (Y/n) "
 read -e response
