@@ -25,6 +25,8 @@ Wp-cli will be installed if it doesn't already exist. wp-install will be install
 
 * Config file for pre-population of email address, username, default theme to install
 * Comes with options to install common plugins
+  * SVG Support
+  * ACF Pro
   * Yoast SEO
   * Regenerate Thumbnails
   * Contact Form 7
@@ -36,4 +38,4 @@ Wp-cli will be installed if it doesn't already exist. wp-install will be install
 * Creates additional pages
 * Sets up pretty urls
 * Deletes hello dolly plugin
-* Add custom post types and taxonomies during install.
+* Add custom post types and taxonomies during install
