@@ -238,6 +238,21 @@ wp plugin delete hello
 hr
 
 
+#ACF Pro
+question "Install ACF Pro? (Y/n) "
+read -e response
+response=${response:-Y}
+
+if [[ $response =~ ^[Yy]$ ]]
+then
+	question "Product key:"
+	read -e key
+	wp plugin install http://connect.advancedcustomfields.com/index.php?t=5.3.0&p=pro&a=download&k=${key} --activate
+fi
+unset response
+echo
+
+
 #SVG Support
 question "Install SVG Support? (Y/n) "
 read -e response
