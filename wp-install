@@ -118,27 +118,27 @@ db_valid=0;
 regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
 while ((db_valid==0))
 	do
-	# accept user input for the database name
-	question "Database Name: "
-	read -e dbname
+		# accept user input for the database name
+		question "Database Name: "
+		read -e dbname
 
-	# accept user input for the databse user
-	question "Database Username: "
-	read -e dbuser
+		# accept user input for the databse user
+		question "Database Username: "
+		read -e dbuser
 
-	# accept user input for the databse password
-	question "Database Password: "
-	read -e dbpass
+		# accept user input for the databse password
+		question "Database Password: "
+		read -e dbpass
 
-	# test database connection before continuing
-	if ! mysql -u ${dbuser} -e -p${dbpass} 'use ${dbname}'; then
-	  echo "Nice one, database connection established."
-		db_valid=1
-	else
-		echo "Unable to establish database connection with details provided."
-		echo "Please check and try again."
-	fi
-done
+		# test database connection before continuing
+		if mysql -u ${dbuser} -p${dbpass} -e "use ${dbname}"; then
+		  echo "Nice one, database connection established."
+			db_valid=1
+		else
+			echo "Unable to establish database connection with details provided."
+			echo "Please check and try again."
+		fi
+	done
 hr
 
 # accept a comma separated list of pages
