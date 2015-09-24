@@ -289,18 +289,6 @@ unset response
 echo
 
 
-# Contact Form 7
-question "Install Contact Form 7? (Y/n) "
-read -e response
-response=${response:-Y}
-if [[ $response =~ ^[Yy]$ ]]
-then
-	wp plugin install contact-form-7 --activate
-fi
-unset response
-echo
-
-
 # Wordpress Sync DB
 question "Install WordPress Sync DB? (Y/n) "
 read -e response
