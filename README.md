@@ -26,10 +26,8 @@ Wp-cli will be installed if it doesn't already exist. wp-install will be install
 * Config file for pre-population of email address, username, default theme to install
 * Comes with options to install common plugins
   * SVG Support
-  * ACF Pro
   * Yoast SEO
   * Regenerate Thumbnails
-  * Contact Form 7
   * Wordpress Sync DB
 * Supports NPM, Bower and Composer
 * Automatically blocks search engine spiders
