@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get wp-cli
 echo "Checking for wp-cli..."
@@ -18,7 +18,7 @@ if [ ! -e ~/.config/wp-install/config ]; then
     mkdir ~/.config/wp-install
   fi
   echo "Creating config file... "
-  cp config ~/.config/wp-install/config 
+  cp config ~/.config/wp-install/config
 fi
 
 sudo cp wp-install /usr/bin/wp-install
@@ -27,4 +27,3 @@ echo "All done!"
 echo
 echo "wp-install is here: /usr/bin/wp-install"
 echo "Config file is here: ~/.config/wp-install/config"
-
