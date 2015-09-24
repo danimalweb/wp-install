@@ -343,12 +343,6 @@ then
 			echo
 		fi
 
-		if [ -a composer.json ]; then
-			title "Installing Composer packages..."
-			echo
-			composer install --quiet
-		fi
-
 		# Activate Theme
 		title "Activating theme..."
 		echo
