@@ -34,7 +34,8 @@ function error {
 }
 
 function question {
-	echo -n "${yellow}$1${clear}"
+	echo
+	echo "${yellow}$1${clear}"
 }
 
 clear
