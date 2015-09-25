@@ -37,6 +37,11 @@ function question {
 	echo -n "${yellow}$1${clear}"
 }
 
+clear
+hr
+echo "WordPress Install Script"
+hr
+
 if [ ! -x "$(command -v wp)" ]; then
 	error "wp-cli is not installed."
 	echo
