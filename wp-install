@@ -115,7 +115,6 @@ title "Database Details"
 echo
 
 db_valid=0;
-regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
 while ((db_valid==0))
 	do
 		# accept user input for the database name
